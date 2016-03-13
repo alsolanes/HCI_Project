@@ -16,7 +16,137 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- function takePic(){
+ //MODELS
+ var url_host = '192.168.1.38';
+
+ var Photo = Backbone.Model.extend({
+    initialize: function(){
+        console.log("Photo created1");
+    }
+ });
+ var Caption = Backbone.Model.extend({
+    initialize: function(){
+        console.log("Caption created2");
+    }
+ });
+ //COLLECTION
+ var PhotoCollection = Backbone.Collection.extend({
+    model: Photo,
+    url: 'http://'+url_host+'/laravel/B2town_server/public',
+ });
+ /**var Caption = Backbone.Collection.extend({
+    url: 'http://'+url_host+'/laravel/B2town_server/public/captions',
+ });*/
+ var CaptionCollection = Backbone.Collection.extend({
+    model: Caption,
+    url: 'http://'+url_host+'/laravel/B2town_server/public/captions',
+ });
+
+var photos = new PhotoCollection;
+var captions = new CaptionCollection;
+
+//VIEWS
+var PhotoView = Backbone.View.extend({
+    tagName: "li",
+    template: _.template($('#photo').html()),
+    initialize: function(){
+        this.model.on('change',this.render, this);
+    },
+    events: {
+        "click a" : "open"
+    },
+    open: function(e){
+        e.preventDefault();
+        $("#modalPicture").html(this.template(this.model.toJSON()));
+        //$("#modalPicture").attr('data-cid',this.model.get('id'));
+        captions.reset();
+        captions.fetch({ url: "http://"+url_host+"/laravel/B2town_server/public/captions/"+ this.model.get('id')});
+        $("#captionsModal").modal('show');
+        return false;
+    },
+    render: function(){
+        this.$el.html(this.template(this.model.toJSON()));
+        return this;
+    }
+});
+
+var PhotosView = Backbone.View.extend({
+    el: $("#list"),
+    initialize: function(){
+        this.collection.on("add",this.addPhoto,this);
+        this.collection.on("reset",this.addAllPhotos,this);
+    },
+    addAllPhotos: function(){
+        this.$el.empty();
+        this.collection.each(this.addPhoto, this);
+    },
+    addPhoto: function(model){
+        view = new PhotoView({model:model});
+        view.render();
+        this.$el.append(view.el);
+    },
+    render: function(){
+        this.addAllPhotos();
+        return this;
+    }
+});
+
+var photosView = new PhotosView({collection:photos});
+photos.fetch();
+
+var CaptionView = Backbone.View.extend({
+    template: _.template($('#caption').html()),
+    initialize: function(){
+        this.model.on('change',this.render,this);
+        console.log("init capt view");
+    },
+    render: function(){
+        this.$el.html(this.template(this.model.toJSON()));
+        return this;
+    }
+});
+
+var CaptionsView = Backbone.View.extend({
+    el: $('#captionsList'),
+
+    initialize: function(){
+        this.collection.on('add',this.addCaption, this);
+        this.collection.bind('reset',this.addAllCaptions, this);
+        
+    },
+    // events:{
+    //     'submit #newCaptionForm' : 'addNewCaption'
+    // },
+    addNewCaption: function(e){
+        
+        e.preventDefault();
+        newCaption = new Caption({photo_id:$('#modalPicture').attr('data-cid'),caption:$('#captionInput').val()});
+        newCaption.save();
+        this.collection.add(newCaption);
+        $('#captionInput').val('');
+
+        return false;
+    },
+    addCaption: function(model){
+        view = new CaptionView({model:model});
+        view.render();
+        this.$el.prepend(view.el);
+    },
+    addAllCaptions: function(){
+        this.$el.empty();
+        //this.$el.append( _.template($('#caption-form').html())); //append the form
+        this.collection.each(this.addCaption, this);
+
+    },
+    render: function(){
+        this.addAllCaptions();
+        return this;
+    } 
+});
+
+var captionsView = new CaptionsView({collection:captions});
+
+function takePic(){
     navigator.camera.getPicture(onSuccess, onFail, { quality: 50,
     destinationType: Camera.DestinationType.FILE,
     //sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY
@@ -24,7 +154,7 @@
  }
 
 function uploadImage(imageData){
-    var serverURL = "http://192.168.1.38/index.php";
+    var serverURL = "http://192.168.1.37/index.php";
     var options = new FileUploadOptions();
     options.fileKey = 'file';
     options.fileName = imageData.substr(imageData.lastIndexOf('/')+1);

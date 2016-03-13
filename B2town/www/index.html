@@ -24,24 +24,67 @@
         <meta charset="utf-8" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-tap-highlight" content="no" />
+        
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <link rel="stylesheet" type="text/css" href="css/index.css" />
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
         <title>Hello World</title>
     </head>
-    <body>
+    <body ng-app>
         <div class="app">
             <h1><a href="#" onclick="takePic();">Take photo</a></h1>
             <h1><a href="#" onclick="chooseImage();">Choose image</a></h1>
-            <img id="myImage" src="" width="50%">
+            <img id="myImage" src="">
             <div id="deviceready" class="blink">
                 <p class="event listening">Connecting to Device</p>
                 <p class="event received">Device is Ready</p>
             </div>
 
+            <ul id="list" class="thumbnails">
+            </ul>
         </div>
+
+
+
+        <div id="captionsModal" class="modal fade" tabindex="-1" role="dialog">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title">Captions</h4>
+		      </div>
+		      <div class="modal-body">
+		        <div id="modalPicture"></div>
+        		<div id="captionsList"></div>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		        
+		      </div>
+		    </div><!-- /.modal-content -->
+		  </div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+
+		<!--<script type="text/template" id="caption-form">
+        	<form id="newCaptionForm">
+        		<textarea id="captionInput" name="caption" class="input-block-level" placeholder="Your Caption"></textarea>
+        		<input type="submit" class="btn btn-small btn-info btn-block" value="Submit Caption">
+        	</form>
+        </script>-->
+
+
+        <script type="text/template" id="caption">
+        	<%= caption %>
+        </script>
+        <script type="text/template" id="photo">
+        	<a class="thumbnail" href="#"><img src="<%= location %>" /></a>
+        </script>
         <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript" src="js/jquery-1.12.1.min.js"></script>
+        <script type="text/javascript" src="js/underscore-min.js"></script>
+        <script type="text/javascript" src="js/backbone-min.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript">
             app.initialize();
         </script>
